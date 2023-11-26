@@ -1,0 +1,37 @@
+main_workflow:
+  steps:
+    - branch_package:
+        source_project: home:ahmedmoselhi2
+        source_package: avidemux
+        target_project: home:ahmedmoselhi2:releases
+    - configure_repositories:
+        project: home:ahmedmoselhi2:releases
+        repositories:
+          - name: openSUSE_Tumbleweed
+            paths:
+              - target_project: openSUSE:Factory
+                target_repository: snapshot
+              - target_project: openSUSE:Tumbleweed
+                target_repository: standard
+            architectures:
+              - x86_64
+              - i586
+          - name: 15.5
+            paths:
+              - target_project: 15.5
+                target_repository: standard
+            architectures:
+              - x86_64
+  filters:
+    event: pull_request
+
+rebuild:
+  steps:
+    - trigger_services:
+        project: home:ahmedmoselhi2
+        package: avidemux
+  filters:
+    event: push
+    branches:
+      only:
+        - master
