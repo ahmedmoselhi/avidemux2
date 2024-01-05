@@ -131,7 +131,7 @@ public:
     void updateStatusBarDisplayInfo(const char * display);
     void updateStatusBarDecoderInfo(const char * decoder);
     void updateStatusBarZoomInfo(int zoom);
-    void notifyStatusBar(int level, const char * lead, const char * msg, int timeout = 2500);
+    void notifyStatusBar(int level, const char * lead, const char * msg, int timeout = 2500, bool flash = true);
 
     void setLightTheme(void);
     void setDarkTheme(void);
@@ -184,7 +184,7 @@ protected:
     QTimer navigateWhilePlayingTimer;
     const  std::vector<IScriptEngine*>& _scriptEngines;
 
-    void addScriptDirToMenu(QMenu* scriptMenu, const QString& dir, const QStringList& fileExts);
+    void addScriptDirToMenu(QMenu* scriptMenu, const QString& dir, const QStringList& fileExts, bool addShortcuts);
     void addScriptEnginesToFileMenu(std::vector<MenuEntry>& fileMenu);
     void addScriptShellsToToolsMenu(vector<MenuEntry>& toolMenu);
     void addScriptReferencesToHelpMenu();
