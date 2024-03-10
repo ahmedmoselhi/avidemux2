@@ -262,20 +262,24 @@ FILE *file;
     This function convert the later to the former
 
 */
-extern char *ADM_slashToBackSlash(const char *in)
+char *ADM_cleanupPath(const char *in)
 {
-    char *out,*cout;
-    int n;
-    n=(int)strlen(in);
-    cout=out=(char *)ADM_alloc(n+1);   
-    for(int i=0;i<n+1;i++)
+    if (!in) return NULL;
+
+    int sz = (int)strlen(in);
+    if (!sz) return NULL;
+
+    char *out = ADM_strdup(in);
+
+#ifdef _WIN32
+    // On Windows, replace backslashes with forward slashes
+    for(int i = 0; i < sz; i++)
     {
-        if(   in[i]=='\\') out[i]='/';
-        else    out[i]=in[i];
-        
+        if (in[i] == '\\')
+            out[i] = '/';
     }
-    return cout;
-    
+#endif
+    return out;
 }
 /*
  * \fn    ADM_getCurrentDate 
