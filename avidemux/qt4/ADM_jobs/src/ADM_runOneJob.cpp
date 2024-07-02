@@ -143,11 +143,11 @@ bool jobWindow::runProcess(spawnData *data)
 {
     vector <string> args;
     if(portable)
-        args.push_back(string("--portable"));
-    args.push_back(string("--nogui"));
+        args.push_back("--portable");
+    args.push_back("--nogui");
     char str[100];
     snprintf(str, 100, "--slave %d", localPort);
-    args.push_back(string(str));
+    args.push_back(str);
     string s = "--run \"";
     s += data->script;
     s += "\"";
@@ -157,9 +157,9 @@ bool jobWindow::runProcess(spawnData *data)
     s += "\"";
     args.push_back(s);
 #ifndef _WIN32
-    args.push_back(string("--quit > /tmp/prout.log"));
+    args.push_back("--quit > /tmp/prout.log");
 #else
-    args.push_back(string("--quit"));
+    args.push_back("--quit");
 #endif
     return spawnProcess(data->exeName,args);
 }
@@ -233,11 +233,22 @@ bool jobWindow::runOneJob( ADMJob &job)
     // 2- Spawn  child
     string ScriptFullPath = ADM_getJobDir(); // already separator-terminated
     ScriptFullPath += job.scriptName;
-    const char *avidemuxVersion=MKCLI();
-    if(ui.checkBoxUseQt4->isChecked())
+    const char *avidemuxVersion = ui.checkBoxUseQt4->isChecked() ? MKQT() : MKCLI();
+#ifdef _WIN32
+    if (portable)
     {
-        avidemuxVersion=MKQT();
+        if (false == ADM_fileExist(admExecutable(avidemuxVersion)))
+        { // Avidemux executable may have been renamed, we support just avidemux{,_cli}_portable.exe
+            const char *avidemuxPortableVersion = ui.checkBoxUseQt4->isChecked() ? "avidemux_portable.exe" : "avidemux_cli_portable.exe";
+            if (false == ADM_fileExist(admExecutable(avidemuxPortableVersion)))
+            {
+                ADM_error("Avidemux executable not found in the same directory, skipping job.\n");
+                goto done;
+            }
+            avidemuxVersion = avidemuxPortableVersion;
+        }
     }
+#endif
     if(false==spawnChild(avidemuxVersion,ScriptFullPath,job.outputFileName))
     {
         ADM_error("Cannot spawn child\n");
